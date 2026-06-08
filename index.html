@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UPSC Vault 📚</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--gold:#e2c97e;--gold2:#c4a84f;--bg:#0a0a0f;--bg2:#0f0f1a;--bg3:#1a1a2e;--border:#2a2a3e;--text:#e8e0d0;--text2:#c4b896;--text3:#888;--green:#27ae60;--red:#c0392b;--orange:#e67e22;--blue:#3498db;--purple:#9b59b6}
+  body{background:var(--bg);color:var(--text);font-family:'Source Sans 3',sans-serif;min-height:100vh}
+  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .fade{animation:fadeIn .3s ease}
+
+  /* NAV */
+  nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:100}
+  .brand{color:var(--gold);font-family:'Playfair Display',serif;font-size:20px;margin-right:auto;letter-spacing:1px}
+  .nav-btn{background:transparent;color:var(--text3);border:1px solid #333;border-radius:6px;padding:6px 14px;cursor:pointer;font-size:13px;font-family:inherit;transition:.2s}
+  .nav-btn.active,.nav-btn:hover{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+
+  /* MAIN */
+  main{max-width:900px;margin:0 auto;padding:24px 16px}
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+  h2{color:var(--gold);font-family:'Playfair Display',serif;font-size:22px;margin-bottom:16px;font-weight:400}
+  h3{color:var(--text2);font-size:16px;margin-bottom:12px;font-weight:400}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+  .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+  .stat-num{font-size:32px;font-weight:700;margin-bottom:4px}
+  .stat-label{font-size:13px;color:var(--text3)}
+  .badge{display:inline-block;border-radius:4px;padding:2px 8px;font-size:12px;margin:2px}
+  .btn{border:none;border-radius:8px;padding:10px 20px;cursor:pointer;font-size:14px;font-family:inherit;font-weight:600;transition:.2s}
+  .btn-primary{background:var(--gold);color:var(--bg)}
+  .btn-primary:hover{background:var(--gold2)}
+  .btn-ghost{background:transparent;border:1px solid #444;color:var(--text)}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+  .btn-danger{background:transparent;border:1px solid #c0392b44;color:var(--red)}
+  .btn-success{background:#1a3a1a;border:1px solid #27ae6044;color:var(--green)}
+  input,select,textarea{background:var(--bg2);border:1px solid #333;border-radius:6px;padding:8px 12px;color:var(--text);font-family:inherit;font-size:14px;width:100%}
+  select{cursor:pointer}
+  .progress-bar-wrap{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+  .progress-bar{height:100%;border-radius:3px;transition:width .4s}
+  .flex{display:flex;gap:10px;flex-wrap:wrap}
+  .flex-between{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+
+  /* TOAST */
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);border-radius:10px;padding:14px 28px;font-size:14px;z-index:9999;box-shadow:0 4px 24px rgba(0,0,0,.5);max-width:90vw;text-align:center;display:none;animation:fadeIn .3s ease}
+
+  /* QUIZ */
+  .option-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text);text-align:left;cursor:pointer;font-family:inherit;font-size:14px;line-height:1.5;width:100%;margin-bottom:10px;transition:.2s}
+  .option-btn:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
+  .option-btn.correct{background:#27ae6022;border-color:var(--green);color:var(--green)}
+  .option-btn.wrong{background:#c0392b22;border-color:var(--red);color:var(--red)}
+  .grade-btn{border:none;border-radius:8px;padding:12px 4px;cursor:pointer;font-family:inherit;font-size:13px;text-align:center;transition:.2s}
+
+  /* UPLOAD */
+  .upload-zone{border:2px dashed #333;border-radius:12px;padding:48px;text-align:center;cursor:pointer;transition:.3s}
+  .upload-zone:hover{border-color:var(--gold)}
+  .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+
+  /* API KEY */
+  .api-overlay{position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+  .api-box{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:480px;width:100%}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<!-- API KEY OVERLAY -->
+<div class="api-overlay" id="apiOverlay">
+  <div class="api-box fade">
+    <div style="font-size:48px;text-align:center;margin-bottom:16px">🔑</div>
+    <h2 style="text-align:center;margin-bottom:8px">Gemini API Key</h2>
+    <p style="color:var(--text3);font-size:14px;text-align:center;margin-bottom:24px;line-height:1.7">
+      Free key lo from <a href="https://aistudio.google.com" target="_blank" style="color:var(--gold)">aistudio.google.com</a><br>
+      "Get API Key" → Create → Copy → Paste here
+    </p>
+    <input type="password" id="apiKeyInput" placeholder="AIza..." style="margin-bottom:12px;font-size:15px;padding:12px">
+    <button class="btn btn-primary" style="width:100%;font-size:16px;padding:14px" onclick="saveApiKey()">Save & Start →</button>
+    <p style="color:var(--text3);font-size:12px;text-align:center;margin-top:12px">Key sirf tumhare browser mein save hoti hai 🔒</p>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="mainNav" style="display:none">
+  <span class="brand">📚 UPSC Vault</span>
+  <button class="nav-btn active" onclick="showView('dashboard')">🏠 Home</button>
+  <button class="nav-btn" onclick="showView('practice')">🎯 Practice</button>
+  <button class="nav-btn" onclick="showView('weak')">⚠ Weak</button>
+  <button class="nav-btn" onclick="showView('progress')">📊 Progress</button>
+  <button class="nav-btn" onclick="showView('upload')">📤 Upload</button>
+</nav>
+
+<main id="mainContent" style="display:none">
+
+  <!-- DASHBOARD -->
+  <div id="view-dashboard" class="fade">
+    <h2>Jai Hind! 🇮🇳 Welcome Back</h2>
+    <div class="grid" id="dashStats"></div>
+    <div class="card" style="margin-top:4px">
+      <h3>⚡ Quick Start</h3>
+      <div class="flex" id="quickStart"></div>
+    </div>
+    <div id="pdfList"></div>
+  </div>
+
+  <!-- PRACTICE -->
+  <div id="view-practice" style="display:none" class="fade">
+    <h2>🎯 Practice Session</h2>
+    <div class="card">
+      <h3>Filters</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label style="font-size:13px;color:var(--text3);display:block;margin-bottom:6px">PDF</label><select id="filterPDF"><option value="all">All PDFs</option></select></div>
+        <div><label style="font-size:13px;color:var(--text3);display:block;margin-bottom:6px">Topic</label><select id="filterTopic"><option value="all">All Topics</option></select></div>
+      </div>
+    </div>
+    <div class="grid" id="practiceGrid"></div>
+  </div>
+
+  <!-- WEAK -->
+  <div id="view-weak" style="display:none" class="fade">
+    <h2>⚠ Weak Topics Dashboard</h2>
+    <div id="weakList"></div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div id="view-progress" style="display:none" class="fade">
+    <h2>📊 Progress & History</h2>
+    <div class="grid" id="progressStats"></div>
+    <div class="card" style="margin-top:4px"><h3>Topic Mastery</h3><div id="topicMastery"></div></div>
+    <div class="card"><h3>Recent Sessions</h3><div id="sessionHistory"></div></div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div id="view-upload" style="display:none" class="fade">
+    <h2>📤 Upload Study Material</h2>
+    <div class="card" id="uploadZone">
+      <div class="upload-zone" onclick="document.getElementById('pdfFile').click()">
+        <div style="font-size:52px;margin-bottom:16px">📄</div>
+        <p style="font-size:17px;margin-bottom:8px">Apne UPSC notes ka PDF upload karo</p>
+        <p style="color:var(--text3);font-size:14px;margin-bottom:24px;line-height:1.7">AI automatically generate karega:<br>✅ Flashcards &nbsp; ✅ UPSC MCQs &nbsp; ✅ Key points</p>
+        <div class="btn btn-primary" style="font-size:16px;padding:14px 32px;display:inline-block">Choose PDF File</div>
+        <p style="color:#444;font-size:12px;margin-top:12px">Best results: 5–50 page PDFs</p>
+      </div>
+      <input type="file" id="pdfFile" accept=".pdf" style="display:none" onchange="handlePDF(this.files[0])">
+    </div>
+    <div class="card" id="uploadedPDFs" style="display:none"><h3>Uploaded PDFs</h3><div id="uploadedList"></div></div>
+    <div class="card" style="margin-top:0">
+      <h3>🔑 Change API Key</h3>
+      <div class="flex">
+        <input type="password" id="newApiKey" placeholder="New Gemini API key..." style="flex:1">
+        <button class="btn btn-primary" onclick="updateApiKey()">Update</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="view-quiz" style="display:none" class="fade">
+    <div style="margin-bottom:20px">
+      <div class="flex-between" style="margin-bottom:8px">
+        <span id="quizCounter" style="color:var(--text3);font-size:13px"></span>
+        <span id="quizStreak" style="color:var(--gold);font-size:13px"></span>
+        <button class="btn btn-ghost" style="padding:6px 14px;font-size:13px" onclick="exitQuiz()">✕ Exit</button>
+      </div>
+      <div class="progress-bar-wrap"><div class="progress-bar" id="quizProgress" style="background:var(--gold)"></div></div>
+    </div>
+    <div class="card" id="quizCard"></div>
+    <div id="quizActions"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="view-result" style="display:none" class="fade">
+    <div class="card" style="text-align:center;padding:40px">
+      <div id="resultEmoji" style="font-size:64px;margin-bottom:16px"></div>
+      <h2 style="text-align:center;font-size:28px">Session Complete!</h2>
+      <div id="resultPct" style="font-size:52px;color:var(--gold);font-weight:700;margin:8px 0"></div>
+      <p id="resultMsg" style="color:var(--text3);margin-bottom:28px"></p>
+      <div class="grid" style="max-width:360px;margin:0 auto 28px" id="resultStats"></div>
+      <div class="flex" style="justify-content:center" id="resultBtns"></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+const STORAGE_KEY = 'upsc_vault_v2';
+let state = { pdfs:[], cards:[], mcqs:[], sessions:[], streak:0, lastStudyDate:null };
+let quiz = { mode:'flashcard', filter:'due', queue:[], index:0, stats:{correct:0,wrong:0,skipped:0} };
+let apiKey = localStorage.getItem('upsc_gemini_key') || '';
+
+function loadState(){ try{ const d=localStorage.getItem(STORAGE_KEY); if(d) state=JSON.parse(d); }catch(e){} }
+function saveState(){ try{ localStorage.setItem(STORAGE_KEY,JSON.stringify(state)); }catch(e){} }
+loadState();
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+window.onload = function(){
+  if(apiKey){ document.getElementById('apiOverlay').style.display='none'; document.getElementById('mainNav').style.display='flex'; document.getElementById('mainContent').style.display='block'; renderDashboard(); }
+};
+
+function saveApiKey(){
+  const k = document.getElementById('apiKeyInput').value.trim();
+  if(!k){ showToast('API key daalo!','error'); return; }
+  apiKey = k; localStorage.setItem('upsc_gemini_key', k);
+  document.getElementById('apiOverlay').style.display='none';
+  document.getElementById('mainNav').style.display='flex';
+  document.getElementById('mainContent').style.display='block';
+  renderDashboard(); showToast('API key saved! ✅');
+}
+
+function updateApiKey(){
+  const k = document.getElementById('newApiKey').value.trim();
+  if(!k){ showToast('Key daalo!','error'); return; }
+  apiKey=k; localStorage.setItem('upsc_gemini_key',k);
+  showToast('API key updated! ✅');
+}
+
+// ═══════════════════════════════════════════════
+// VIEWS
+// ═══════════════════════════════════════════════
+const views = ['dashboard','practice','weak','progress','upload','quiz','result'];
+function showView(v){
+  views.forEach(x=>{ document.getElementById('view-'+x).style.display= x===v?'block':'none'; });
+  document.querySelectorAll('.nav-btn').forEach(b=>{ b.classList.toggle('active', b.textContent.toLowerCase().includes(v)); });
+  if(v==='dashboard') renderDashboard();
+  else if(v==='practice') renderPractice();
+  else if(v==='weak') renderWeak();
+  else if(v==='progress') renderProgress();
+  else if(v==='upload') renderUpload();
+}
+
+// ═══════════════════════════════════════════════
+// SM-2
+// ═══════════════════════════════════════════════
+function sm2(card, grade){
+  let {interval=1,repetitions=0,easeFactor=2.5,lapses=0} = card;
+  if(grade===0){ lapses++;repetitions=0;interval=1; }
+  else{ if(repetitions===0)interval=1; else if(repetitions===1)interval=3; else interval=Math.round(interval*easeFactor); repetitions++; easeFactor=Math.max(1.3,easeFactor+0.1-(3-grade)*(0.08+(3-grade)*0.02)); }
+  const d=new Date(); d.setDate(d.getDate()+interval);
+  return {interval,repetitions,easeFactor,lapses,dueDate:d.toISOString(),lastReviewed:new Date().toISOString()};
+}
+function isDue(c){ return !c.dueDate || new Date(c.dueDate)<=new Date(); }
+
+// ═══════════════════════════════════════════════
+// COMPUTED
+// ═══════════════════════════════════════════════
+function getDue(){ return {cards:state.cards.filter(isDue).length, mcqs:state.mcqs.filter(isDue).length}; }
+function getTopicStats(){
+  const t={};
+  [...state.cards,...state.mcqs].forEach(c=>{
+    if(!t[c.topic])t[c.topic]={total:0,wrong:0,skipped:0};
+    t[c.topic].total++; t[c.topic].wrong+=(c.wrongCount||0); t[c.topic].skipped+=(c.skippedCount||0);
+  });
+  return t;
+}
+function getAllTopics(){ return [...new Set([...state.cards,...state.mcqs].map(c=>c.topic))]; }
+
+// ═══════════════════════════════════════════════
+// RENDER DASHBOARD
+// ═══════════════════════════════════════════════
+function renderDashboard(){
+  const due=getDue(); const ts=getTopicStats();
+  const weakCount=Object.values(ts).filter(t=>t.wrong>0||t.skipped>0).length;
+  const stats=[
+    {label:'🔥 Day Streak',val:state.streak,color:'var(--orange)'},
+    {label:'📝 Due Flashcards',val:due.cards,color:'var(--gold)'},
+    {label:'🎯 Due MCQs',val:due.mcqs,color:'var(--blue)'},
+    {label:'⚠ Weak Topics',val:weakCount,color:'var(--red)'},
+  ];
+  document.getElementById('dashStats').innerHTML = stats.map(s=>`<div class="stat-card" style="border-top:3px solid ${s.color}"><div class="stat-num" style="color:${s.color}">${s.val}</div><div class="stat-label">${s.label}</div></div>`).join('');
+
+  document.getElementById('quickStart').innerHTML = `
+    <button class="btn btn-primary" onclick="startQuiz('flashcard','due')">📝 Due Flashcards (${due.cards})</button>
+    <button class="btn btn-ghost" onclick="startQuiz('mcq','due')" style="background:#1a2a3a">🎯 Due MCQs (${due.mcqs})</button>
+    <button class="btn btn-ghost" onclick="startQuiz('flashcard','weak')" style="background:#2a1a1a">⚠ Weak Topics</button>
+    <button class="btn btn-success" onclick="showView('upload')">📤 Upload PDF</button>`;
+
+  if(state.pdfs.length===0){
+    document.getElementById('pdfList').innerHTML=`<div class="card" style="text-align:center;padding:48px;border:1px dashed #333"><div style="font-size:52px;margin-bottom:16px">📂</div><p style="color:var(--text3);margin-bottom:20px;font-size:16px">Koi notes nahi hai. PDF upload karo!</p><button class="btn btn-primary" onclick="showView('upload')">Upload First PDF →</button></div>`;
+  } else {
+    document.getElementById('pdfList').innerHTML=`<div class="card"><h3>📂 Study Material (${state.pdfs.length} PDFs)</h3>${state.pdfs.map(p=>`<div style="border-bottom:1px solid var(--bg3);padding:12px 0"><div class="flex-between"><div><p style="color:var(--gold);margin-bottom:4px">📄 ${p.name}</p><p style="color:var(--text3);font-size:13px">${p.topic} • ${p.cardCount} flashcards • ${p.mcqCount} MCQs</p></div><div class="flex"><button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" onclick="startQuizFiltered('flashcard','all','${p.id}')">Practice</button><button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="deletePDF('${p.id}')">Delete</button></div></div></div>`).join('')}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// RENDER PRACTICE
+// ═══════════════════════════════════════════════
+function renderPractice(){
+  const due=getDue();
+  const pfSel=document.getElementById('filterPDF');
+  const ptSel=document.getElementById('filterTopic');
+  pfSel.innerHTML='<option value="all">All PDFs</option>'+state.pdfs.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  ptSel.innerHTML='<option value="all">All Topics</option>'+getAllTopics().map(t=>`<option value="${t}">${t}</option>`).join('');
+
+  const items=[
+    {title:'Due Flashcards',desc:'Cards due for review (Spaced Repetition)',icon:'🗂',mode:'flashcard',filter:'due',count:due.cards,color:'var(--gold)'},
+    {title:'All Flashcards',desc:'Practice all your notes anytime',icon:'📝',mode:'flashcard',filter:'all',count:state.cards.length,color:'var(--blue)'},
+    {title:'Due MCQs',desc:'UPSC-style questions due today',icon:'🎯',mode:'mcq',filter:'due',count:due.mcqs,color:'var(--green)'},
+    {title:'All MCQs',desc:'Full MCQ bank — all questions',icon:'✅',mode:'mcq',filter:'all',count:state.mcqs.length,color:'var(--purple)'},
+    {title:'Weak Flashcards',desc:'Cards you got wrong or skipped',icon:'⚠',mode:'flashcard',filter:'weak',count:state.cards.filter(c=>c.wrongCount>0||c.skippedCount>0).length,color:'var(--red)'},
+    {title:'Weak MCQs',desc:'MCQs you got wrong or skipped',icon:'🔄',mode:'mcq',filter:'weak',count:state.mcqs.filter(c=>c.wrongCount>0||c.skippedCount>0).length,color:'var(--orange)'},
+  ];
+  document.getElementById('practiceGrid').innerHTML=items.map(i=>`<div class="card" style="cursor:pointer;border-top:3px solid ${i.color}" onclick="startQuizWithFilter('${i.mode}','${i.filter}')" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'" style="cursor:pointer;border-top:3px solid ${i.color};transition:.2s"><div style="font-size:28px;margin-bottom:10px">${i.icon}</div><h3 style="color:${i.color};margin-bottom:6px;font-size:15px">${i.title}</h3><p style="color:var(--text3);font-size:13px;margin-bottom:10px;line-height:1.5">${i.desc}</p><span class="badge" style="background:${i.color}22;color:${i.color};border:1px solid ${i.color}44">${i.count} cards</span></div>`).join('');
+}
+
+function startQuizWithFilter(mode,filter){
+  const pdfId=document.getElementById('filterPDF')?.value||'all';
+  const topic=document.getElementById('filterTopic')?.value||'all';
+  startQuiz(mode,filter,pdfId,topic);
+}
+
+// ═══════════════════════════════════════════════
+// RENDER WEAK
+// ═══════════════════════════════════════════════
+function renderWeak(){
+  const ts=getTopicStats();
+  const weak=Object.entries(ts).filter(([_,s])=>s.wrong>0||s.skipped>0).sort((a,b)=>(b[1].wrong+b[1].skipped)-(a[1].wrong+a[1].skipped));
+  if(!weak.length){ document.getElementById('weakList').innerHTML=`<div class="card" style="text-align:center;padding:40px"><div style="font-size:48px">🎉</div><p style="color:var(--green);font-size:16px;margin-top:12px">Koi weak topic nahi! Keep practicing.</p></div>`; return; }
+  document.getElementById('weakList').innerHTML=weak.map(([topic,s])=>{
+    const err=Math.round(((s.wrong+s.skipped)/s.total)*100);
+    const col=err>60?'var(--red)':err>30?'var(--orange)':'var(--gold)';
+    return `<div class="card"><div class="flex-between" style="margin-bottom:12px"><h3 style="color:var(--text);margin:0;font-size:17px">${topic}</h3><span class="badge" style="background:${col}22;color:${col};border:1px solid ${col}44">${err}% error</span></div><div class="flex" style="font-size:14px;color:var(--text3);margin-bottom:12px"><span>❌ ${s.wrong} wrong</span><span>⏭ ${s.skipped} skipped</span><span>📊 ${s.total} total</span></div><div class="progress-bar-wrap" style="margin-bottom:14px"><div class="progress-bar" style="width:${100-err}%;background:${col}"></div></div><div class="flex"><button class="btn btn-primary" style="padding:8px 16px;font-size:13px" onclick="startQuiz('flashcard','weak','all','${topic}')">Revise Flashcards</button><button class="btn btn-ghost" style="padding:8px 16px;font-size:13px" onclick="startQuiz('mcq','weak','all','${topic}')">Revise MCQs</button></div></div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// RENDER PROGRESS
+// ═══════════════════════════════════════════════
+function renderProgress(){
+  document.getElementById('progressStats').innerHTML=[
+    {label:'Total Flashcards',val:state.cards.length,color:'var(--gold)'},
+    {label:'Total MCQs',val:state.mcqs.length,color:'var(--blue)'},
+    {label:'Sessions Done',val:state.sessions.length,color:'var(--green)'},
+    {label:'🔥 Day Streak',val:state.streak,color:'var(--orange)'},
+  ].map(s=>`<div class="stat-card" style="border-bottom:3px solid ${s.color}"><div class="stat-num" style="color:${s.color}">${s.val}</div><div class="stat-label">${s.label}</div></div>`).join('');
+
+  const ts=getTopicStats();
+  document.getElementById('topicMastery').innerHTML=Object.entries(ts).length===0?`<p style="color:var(--text3);font-size:14px">Practice karo — phir stats dikhenge!</p>`:Object.entries(ts).map(([topic,s])=>{
+    const acc=s.wrong===0?100:Math.round(((s.total-s.wrong)/s.total)*100);
+    const col=acc>70?'var(--green)':acc>40?'var(--orange)':'var(--red)';
+    return `<div style="margin-bottom:16px"><div class="flex-between" style="font-size:14px;margin-bottom:6px"><span>${topic}</span><span style="color:${col}">${acc}%</span></div><div class="progress-bar-wrap"><div class="progress-bar" style="width:${acc}%;background:${col}"></div></div></div>`;
+  }).join('');
+
+  document.getElementById('sessionHistory').innerHTML=state.sessions.length===0?`<p style="color:var(--text3);font-size:14px">Koi session complete nahi hua.</p>`:state.sessions.slice(0,15).map(s=>{
+    const pct=s.total>0?Math.round((s.correct/s.total)*100):0;
+    const col=pct>=70?'var(--green)':pct>=40?'var(--orange)':'var(--red)';
+    return `<div class="flex-between" style="padding:10px 0;border-bottom:1px solid var(--bg3);font-size:14px"><span style="color:var(--text3)">${new Date(s.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</span><span style="color:var(--text3)">${s.mode==='flashcard'?'Flashcards':'MCQs'}</span><span style="color:var(--text3)">${s.total} cards</span><span style="color:var(--green)">✓${s.correct}</span><span style="color:var(--red)">✗${s.wrong}</span><span style="color:${col};font-weight:700">${pct}%</span></div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// RENDER UPLOAD
+// ═══════════════════════════════════════════════
+function renderUpload(){
+  if(state.pdfs.length>0){
+    document.getElementById('uploadedPDFs').style.display='block';
+    document.getElementById('uploadedList').innerHTML=state.pdfs.map(p=>`<div style="padding:12px 0;border-bottom:1px solid var(--bg3)"><div class="flex-between"><div><p style="color:var(--gold);margin-bottom:4px">📄 ${p.name}</p><p style="color:var(--text3);font-size:12px">${p.topic} • ${p.cardCount} flashcards • ${p.mcqCount} MCQs</p></div><button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="deletePDF('${p.id}')">Delete</button></div></div>`).join('');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// PDF UPLOAD & AI
+// ═══════════════════════════════════════════════
+async function handlePDF(file){
+  if(!file) return;
+  const zone=document.getElementById('uploadZone');
+  zone.innerHTML=`<div style="text-align:center;padding:40px"><div class="spinner"></div><p style="color:var(--gold);font-size:18px;margin-bottom:8px">AI Processing...</p><p id="uploadMsg" style="color:var(--text3)">Reading PDF...</p></div>`;
+
+  try{
+    const setMsg=m=>document.getElementById('uploadMsg').textContent=m;
+
+    setMsg('Converting PDF...');
+    const base64=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result.split(',')[1]); r.onerror=rej; r.readAsDataURL(file); });
+
+    setMsg('Extracting text from PDF...');
+    const extRes=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{inline_data:{mime_type:'application/pdf',data:base64}},{text:'Extract all text content from this PDF. Return only the raw text, preserve headings and structure.'}]}]})
+    });
+    const extData=await extRes.json();
+    const text=extData.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    if(!text) throw new Error('PDF text extract failed');
+
+    setMsg('Generating UPSC flashcards & MCQs...');
+    const prompt=`You are a UPSC exam expert. Analyze this content and generate study material.
+Content from: "${file.name}"
+---
+${text.slice(0,12000)}
+---
+Generate EXACTLY this JSON (no markdown, no explanation, just raw JSON):
+{"topic":"main topic","subtopics":["s1","s2"],"flashcards":[{"id":"f1","question":"...","answer":"...","difficulty":"Easy","subtopic":"..."}],"mcqs":[{"id":"m1","question":"Consider the following statements:\\n1. ...\\n2. ...\\nWhich of the above is/are correct?","options":["1 only","2 only","Both 1 and 2","Neither 1 nor 2"],"correct":0,"explanation":"...","difficulty":"Moderate","subtopic":"..."}],"keypoints":["p1","p2"]}
+Generate at least 10 flashcards and 8 MCQs. MCQs must be UPSC Prelims statement-based style.`;
+
+    const genRes=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.3,maxOutputTokens:8192}})
+    });
+    const genData=await genRes.json();
+    const raw=genData.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const generated=JSON.parse(clean);
+
+    const pdfId='pdf_'+Date.now();
+    const newCards=generated.flashcards.map((f,i)=>({...f,id:`${pdfId}_f${i}`,pdfId,pdfName:file.name,topic:generated.topic,type:'flashcard',interval:1,repetitions:0,easeFactor:2.5,lapses:0,dueDate:new Date().toISOString(),lastReviewed:null,wrongCount:0,skippedCount:0}));
+    const newMCQs=generated.mcqs.map((m,i)=>({...m,id:`${pdfId}_m${i}`,pdfId,pdfName:file.name,topic:generated.topic,type:'mcq',interval:1,repetitions:0,easeFactor:2.5,lapses:0,dueDate:new Date().toISOString(),lastReviewed:null,wrongCount:0,skippedCount:0}));
+    const newPDF={id:pdfId,name:file.name,topic:generated.topic,subtopics:generated.subtopics,keypoints:generated.keypoints,uploadedAt:new Date().toISOString(),cardCount:newCards.length,mcqCount:newMCQs.length};
+
+    state.pdfs.push(newPDF); state.cards.push(...newCards); state.mcqs.push(...newMCQs);
+    saveState();
+    showToast(`✅ ${file.name} done! ${newCards.length} flashcards + ${newMCQs.length} MCQs`);
+    renderUpload();
+    zone.innerHTML=`<div class="upload-zone" onclick="document.getElementById('pdfFile').click()"><div style="font-size:52px;margin-bottom:16px">📄</div><p style="font-size:17px;margin-bottom:8px">Apne UPSC notes ka PDF upload karo</p><p style="color:var(--text3);font-size:14px;margin-bottom:24px;line-height:1.7">AI automatically generate karega:<br>✅ Flashcards &nbsp; ✅ UPSC MCQs &nbsp; ✅ Key points</p><div class="btn btn-primary" style="font-size:16px;padding:14px 32px;display:inline-block">Choose PDF File</div><p style="color:#444;font-size:12px;margin-top:12px">Best results: 5–50 page PDFs</p></div><input type="file" id="pdfFile" accept=".pdf" style="display:none" onchange="handlePDF(this.files[0])">`;
+  } catch(e){
+    showToast('❌ Error: '+e.message,'error');
+    renderUpload();
+    zone.innerHTML=`<div class="upload-zone" onclick="document.getElementById('pdfFile').click()"><div style="font-size:52px;margin-bottom:16px">📄</div><p style="font-size:17px;margin-bottom:8px">Apne UPSC notes ka PDF upload karo</p><div class="btn btn-primary" style="font-size:16px;padding:14px 32px;display:inline-block">Choose PDF File</div></div><input type="file" id="pdfFile" accept=".pdf" style="display:none" onchange="handlePDF(this.files[0])">`;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════════
+function startQuiz(mode,filter,pdfId='all',topic='all'){
+  let pool=mode==='flashcard'?[...state.cards]:[...state.mcqs];
+  if(pdfId!=='all') pool=pool.filter(c=>c.pdfId===pdfId);
+  if(topic!=='all') pool=pool.filter(c=>c.topic===topic);
+  if(filter==='due') pool=pool.filter(isDue);
+  else if(filter==='weak') pool=pool.filter(c=>c.wrongCount>0||c.skippedCount>0).sort((a,b)=>(b.wrongCount+b.skippedCount)-(a.wrongCount+a.skippedCount));
+  if(!pool.length){ showToast('No cards match this filter!','error'); return; }
+
+  quiz={mode,filter,queue:pool,index:0,stats:{correct:0,wrong:0,skipped:0}};
+  showView('quiz');
+  renderQuizCard();
+}
+
+function startQuizFiltered(mode,filter,pdfId){
+  startQuiz(mode,filter,pdfId,'all');
+}
+
+function renderQuizCard(){
+  const card=quiz.queue[quiz.index];
+  const pct=(quiz.index/quiz.queue.length)*100;
+  document.getElementById('quizCounter').textContent=`${quiz.index+1} / ${quiz.queue.length}`;
+  document.getElementById('quizStreak').textContent=`🔥 ${state.streak} days`;
+  document.getElementById('quizProgress').style.width=pct+'%';
+
+  const diffCol=card.difficulty==='Easy'?'var(--green)':card.difficulty==='Difficult'?'var(--red)':'var(--orange)';
+  const weakBadge=(card.wrongCount>0||card.skippedCount>0)?`<span class="badge" style="background:#c0392b22;color:var(--red);border:1px solid #c0392b44">⚠ Weak ×${(card.wrongCount||0)+(card.skippedCount||0)}</span>`:'';
+
+  if(quiz.mode==='mcq'){
+    document.getElementById('quizCard').innerHTML=`
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <span class="badge" style="background:${diffCol}22;color:${diffCol};border:1px solid ${diffCol}44">${card.difficulty}</span>
+        <span class="badge" style="background:var(--blue)22;color:var(--blue);border:1px solid var(--blue)44">${card.topic}</span>
+        ${weakBadge}
+      </div>
+      <p style="font-size:16px;line-height:1.8;margin-bottom:16px;white-space:pre-line">${card.question}</p>
+      <div id="optionsList">
+        ${card.options.map((o,i)=>`<button class="option-btn" id="opt${i}" onclick="selectOption(${i})">${['A','B','C','D'][i]}. ${o}</button>`).join('')}
+      </div>
+      <div id="explanation" style="display:none;background:#27ae6011;border:1px solid #27ae6044;border-radius:8px;padding:14px;margin-top:4px">
+        <p style="color:var(--green);font-weight:600;margin-bottom:6px">Explanation:</p>
+        <p style="color:#b8c8b8;font-size:14px;line-height:1.7">${card.explanation}</p>
+      </div>`;
+    document.getElementById('quizActions').innerHTML='';
+  } else {
+    document.getElementById('quizCard').innerHTML=`
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <span class="badge" style="background:${diffCol}22;color:${diffCol};border:1px solid ${diffCol}44">${card.difficulty}</span>
+        <span class="badge" style="background:var(--blue)22;color:var(--blue);border:1px solid var(--blue)44">${card.topic}</span>
+        ${weakBadge}
+      </div>
+      <p style="font-size:17px;line-height:1.8;margin-bottom:16px">${card.question}</p>
+      <div id="answerBox" style="display:none;background:var(--bg3);border-radius:8px;padding:16px;border-left:3px solid var(--gold)">
+        <p style="color:var(--gold);font-size:12px;letter-spacing:1px;margin-bottom:8px">ANSWER</p>
+        <p style="line-height:1.8">${card.answer}</p>
+      </div>`;
+    document.getElementById('quizActions').innerHTML=`<button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="revealAnswer()">Reveal Answer →</button>`;
+  }
+}
+
+function revealAnswer(){
+  document.getElementById('answerBox').style.display='block';
+  document.getElementById('quizActions').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+      ${[{l:'Again',g:0,c:'#c0392b',s:'<1d'},{l:'Hard',g:1,c:'#e67e22',s:'3d'},{l:'Good',g:2,c:'#27ae60',s:'7d'},{l:'Easy',g:3,c:'#2980b9',s:'14d+'}].map(x=>`<button class="grade-btn" style="background:${x.c}22;border:1px solid ${x.c};color:${x.c}" onclick="gradeCard(${x.g},${x.g>=2})">${x.l}<div style="font-size:11px;opacity:.7;margin-top:2px">${x.s}</div></button>`).join('')}
+    </div>
+    <button class="btn btn-ghost" style="width:100%;font-size:13px" onclick="gradeCard(-1,false)">Skip</button>`;
+}
+
+function selectOption(i){
+  const card=quiz.queue[quiz.index];
+  document.querySelectorAll('.option-btn').forEach((b,idx)=>{
+    b.disabled=true;
+    if(idx===card.correct) b.classList.add('correct');
+    else if(idx===i && i!==card.correct) b.classList.add('wrong');
+  });
+  document.getElementById('explanation').style.display='block';
+  const correct=i===card.correct;
+  document.getElementById('quizActions').innerHTML=`<button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="gradeCard(${correct?2:0},${correct})">Next →</button><button class="btn btn-ghost" style="width:100%;margin-top:8px;font-size:13px" onclick="gradeCard(-1,false)">Skip</button>`;
+}
+
+function gradeCard(grade, isCorrect){
+  const card=quiz.queue[quiz.index];
+  const upd=sm2(card,grade);
+  const update=arr=>arr.map(c=>c.id===card.id?{...c,...upd,wrongCount:grade===0?(c.wrongCount||0)+1:(c.wrongCount||0),skippedCount:grade===-1?(c.skippedCount||0)+1:(c.skippedCount||0)}:c);
+  state.cards=quiz.mode==='flashcard'?update(state.cards):state.cards;
+  state.mcqs=quiz.mode==='mcq'?update(state.mcqs):state.mcqs;
+
+  quiz.stats.correct+=isCorrect?1:0;
+  quiz.stats.wrong+=(!isCorrect&&grade!==-1)?1:0;
+  quiz.stats.skipped+=grade===-1?1:0;
+
+  quiz.index++;
+  if(quiz.index>=quiz.queue.length){
+    const today=new Date().toDateString();
+    const yesterday=new Date(Date.now()-86400000).toDateString();
+    state.streak=state.lastStudyDate===yesterday?state.streak+1:state.lastStudyDate===today?state.streak:1;
+    state.lastStudyDate=today;
+    state.sessions=[{date:new Date().toISOString(),mode:quiz.mode,total:quiz.queue.length,...quiz.stats},...state.sessions].slice(0,50);
+    saveState();
+    showResult();
+  } else {
+    saveState();
+    renderQuizCard();
+  }
+}
+
+function showResult(){
+  const t=quiz.queue.length;
+  const pct=t>0?Math.round((quiz.stats.correct/t)*100):0;
+  showView('result');
+  document.getElementById('resultEmoji').textContent=pct>=80?'🏆':pct>=60?'📈':pct>=40?'💪':'🔄';
+  document.getElementById('resultPct').textContent=pct+'%';
+  document.getElementById('resultMsg').textContent=pct>=80?'Excellent! You are on fire!':pct>=60?'Good progress. Keep it up!':pct>=40?'Keep practicing. You will get there!':'Review weak topics and retry!';
+  document.getElementById('resultStats').innerHTML=[
+    {l:'Correct',v:quiz.stats.correct,c:'var(--green)'},
+    {l:'Wrong',v:quiz.stats.wrong,c:'var(--red)'},
+    {l:'Skipped',v:quiz.stats.skipped,c:'var(--orange)'},
+  ].map(s=>`<div class="stat-card"><div class="stat-num" style="color:${s.c}">${s.v}</div><div class="stat-label">${s.l}</div></div>`).join('');
+  document.getElementById('resultBtns').innerHTML=`
+    <button class="btn btn-primary" onclick="showView('dashboard')">🏠 Dashboard</button>
+    <button class="btn btn-ghost" onclick="startQuiz('${quiz.mode}','weak')">⚠ Practice Weak</button>
+    <button class="btn btn-ghost" onclick="startQuiz('${quiz.mode}','${quiz.filter}')">🔄 Retry</button>`;
+}
+
+function exitQuiz(){ showView('dashboard'); }
+
+// ═══════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════
+function deletePDF(pdfId){
+  if(!confirm('Delete this PDF and all its cards?')) return;
+  state.pdfs=state.pdfs.filter(p=>p.id!==pdfId);
+  state.cards=state.cards.filter(c=>c.pdfId!==pdfId);
+  state.mcqs=state.mcqs.filter(c=>c.pdfId!==pdfId);
+  saveState(); showToast('PDF deleted'); renderDashboard(); renderUpload();
+}
+
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.background=type==='error'?'#c0392b':'#27ae60';
+  t.style.color='#fff'; t.style.display='block';
+  setTimeout(()=>t.style.display='none',3500);
+}
+</script>
+</body>
+</html>
